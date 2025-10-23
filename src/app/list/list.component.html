@@ -1,0 +1,10 @@
+<!-- list.component.html - Displays list of items with edit/delete buttons -->
+<h2>Item List</h2>
+<button (click)="onAdd()">Add New Item</button>
+<ul>
+  <li *ngFor="let item of items">
+    <strong>ID:</strong> {{ item.id }} | <strong>Name:</strong> {{ item.name }} | <strong>Description:</strong> {{ item.description }}
+    <button (click)="onEdit(item.id)">Edit</button>
+    <button (click)="onDelete(item.id)">Delete</button>
+  </li>
+</ul>

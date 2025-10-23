@@ -1,0 +1,21 @@
+<!-- form.component.html - Reactive form for adding/updating items -->
+<h2>{{ isEditMode ? 'Edit Item' : 'Add Item' }}</h2>
+<form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label for="id">ID:</label>
+    <input id="id" type="number" formControlName="id" [class.error]="itemForm.get('id')?.invalid && itemForm.get('id')?.touched">
+    <div *ngIf="itemForm.get('id')?.invalid && itemForm.get('id')?.touched" class="error">ID must be a positive number.</div>
+  </div>
+  <div>
+    <label for="name">Name:</label>
+    <input id="name" type="text" formControlName="name" [class.error]="itemForm.get('name')?.invalid && itemForm.get('name')?.touched">
+    <div *ngIf="itemForm.get('name')?.invalid && itemForm.get('name')?.touched" class="error">Name cannot contain special characters like #, !, ?.</div>
+  </div>
+  <div>
+    <label for="description">Description:</label>
+    <textarea id="description" formControlName="description" [class.error]="itemForm.get('description')?.invalid && itemForm.get('description')?.touched"></textarea>
+    <div *ngIf="itemForm.get('description')?.invalid && itemForm.get('description')?.touched" class="error">Description is required.</div>
+  </div>
+  <button type="submit" [disabled]="itemForm.invalid">{{ isEditMode ? 'Update' : 'Add' }} Item</button>
+  <button type="button" (click)="onReset()">Reset</button>
+</form>
