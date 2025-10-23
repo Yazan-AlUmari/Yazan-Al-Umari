@@ -1,4 +1,4 @@
-// data.service.ts - Service to handle CRUD operations on mock data
+// data.service.ts
 import { Injectable } from '@angular/core';
 import { mockData, IContent } from './mock-data';
 
