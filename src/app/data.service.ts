@@ -20,7 +20,6 @@ export class DataService {
     return this.items.find(item => item.id === id);
   }
 
-
   addItem(item: IContent): void {
     this.items.push(item);
   }
