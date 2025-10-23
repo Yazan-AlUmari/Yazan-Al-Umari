@@ -1,4 +1,4 @@
-// list.component.ts - Displays list of items with edit/delete buttons
+// list.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataService } from '../data.service';
