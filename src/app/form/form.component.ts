@@ -1,4 +1,4 @@
-// form.component.ts - Handles the reactive form for adding/updating items
+// form.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
