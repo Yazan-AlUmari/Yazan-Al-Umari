@@ -12,6 +12,10 @@ import { IContent } from '../mock-data';
 export class ListComponent implements OnInit {
   items: IContent[] = [];
   errorMessage: string = '';
+  currentPage: number = 1;
+  pageSize: number = 10;
+  sort: string = 'id';
+  totalItems: number = 0;
 
   constructor(private dataService: DataService, private router: Router) { }
 
@@ -20,10 +24,29 @@ export class ListComponent implements OnInit {
   }
 
   loadItems(): void {
-    this.dataService.getItems().subscribe(
-      items => this.items = items,
+    this.dataService.getItems(this.currentPage, this.pageSize, this.sort).subscribe(
+      response => {
+        this.items = response.body;
+        this.totalItems = +response.headers.get('X-Total-Count')!;
+      },
       error => this.errorMessage = error
     );
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadItems();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pageSize = pageSize;
+    this.currentPage = 1; // Reset to first page when changing page size
+    this.loadItems();
+  }
+
+  onSortChange(sort: string): void {
+    this.sort = sort;
+    this.loadItems();
   }
 
   onEdit(id: number): void {

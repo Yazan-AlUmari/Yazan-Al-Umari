@@ -1,6 +1,6 @@
 // data.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { IContent } from './mock-data';
@@ -9,7 +9,7 @@ import { IContent } from './mock-data';
   providedIn: 'root'
 })
 export class DataService {
-  private itemsUrl = 'api/items';
+  private itemsUrl = 'api/items';  // URL to web api
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -17,13 +17,16 @@ export class DataService {
 
   constructor(private http: HttpClient) { }
 
-  // Read: Get all items
-  getItems(): Observable<IContent[]> {
-    return this.http.get<IContent[]>(this.itemsUrl)
-      .pipe(
-        tap(_ => this.log('fetched items')),
-        catchError(this.handleError<IContent[]>('getItems', []))
-      );
+  // Read: Get all items with pagination and sorting
+  getItems(page: number = 1, pageSize: number = 10, sort: string = 'id'): Observable<IContent[]> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString())
+      .set('sort', sort);
+    return this.http.get<IContent[]>(this.itemsUrl, { params }).pipe(
+      tap(_ => this.log('fetched items')),
+      catchError(this.handleError<IContent[]>('getItems', []))
+    );
   }
 
   // Read: Get a single item by ID

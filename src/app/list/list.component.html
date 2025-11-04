@@ -1,6 +1,23 @@
 <!-- list.component.html -->
 <h2>Item List</h2>
 <button (click)="onAdd()">Add New Item</button>
+<div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+<div>
+  <label for="pageSize">Items per page:</label>
+  <select id="pageSize" (change)="onPageSizeChange($event.target.value)">
+    <option value="5">5</option>
+    <option value="10" selected>10</option>
+    <option value="20">20</option>
+  </select>
+</div>
+<div>
+  <label for="sort">Sort by:</label>
+  <select id="sort" (change)="onSortChange($event.target.value)">
+    <option value="id">ID</option>
+    <option value="name">Name</option>
+    <option value="description">Description</option>
+  </select>
+</div>
 <ul>
   <li *ngFor="let item of items">
     <strong>ID:</strong> {{ item.id }} | <strong>Name:</strong> {{ item.name }} | <strong>Description:</strong> {{ item.description }}
@@ -8,3 +25,8 @@
     <button (click)="onDelete(item.id)">Delete</button>
   </li>
 </ul>
+<div>
+  <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+  <span>Page {{ currentPage }} of {{ totalItems / pageSize }}</span>
+  <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage * pageSize >= totalItems">Next</button>
+</div>
