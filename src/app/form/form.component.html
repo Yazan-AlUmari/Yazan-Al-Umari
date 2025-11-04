@@ -16,6 +16,7 @@
     <textarea id="description" formControlName="description" [class.error]="itemForm.get('description')?.invalid && itemForm.get('description')?.touched"></textarea>
     <div *ngIf="itemForm.get('description')?.invalid && itemForm.get('description')?.touched" class="error">Description is required.</div>
   </div>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
   <button type="submit" [disabled]="itemForm.invalid">{{ isEditMode ? 'Update' : 'Add' }} Item</button>
   <button type="button" (click)="onReset()">Reset</button>
 </form>

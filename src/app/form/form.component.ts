@@ -11,34 +11,37 @@ import { IContent } from '../mock-data';
   styleUrls: ['./form.component.css']
 })
 export class FormComponent implements OnInit {
-  itemForm: FormGroup;  // Reactive form group
-  isEditMode = false;  // Flag for edit vs add
+  itemForm: FormGroup;
+  isEditMode = false;
   currentId: number | null = null;
+  errorMessage: string = '';
 
   constructor(
-    private fb: FormBuilder,  // FormBuilder for reactive forms
+    private fb: FormBuilder,
     private dataService: DataService,
     private route: ActivatedRoute,
     private router: Router
   ) {
-    // Initialize form with validators
     this.itemForm = this.fb.group({
-      id: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.min(1)]],  // ID: positive number only
-      name: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9\s]+$/)]],  // Name: no special chars like #, !, ?
+      id: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.min(1)]],
+      name: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9\s]+$/)]],
       description: ['', Validators.required]
     });
   }
 
   ngOnInit(): void {
-    // Check if editing (via route param)
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
       this.currentId = +id;
-      const item = this.dataService.getItemById(this.currentId);
-      if (item) {
-        this.itemForm.patchValue(item);  // Load item into form
-      }
+      this.dataService.getItemById(this.currentId).subscribe(
+        item => {
+          if (item) {
+            this.itemForm.patchValue(item);
+          }
+        },
+        error => this.errorMessage = error
+      );
     }
   }
 
@@ -46,16 +49,21 @@ export class FormComponent implements OnInit {
     if (this.itemForm.valid) {
       const item: IContent = this.itemForm.value;
       if (this.isEditMode && this.currentId !== null) {
-        this.dataService.updateItem(this.currentId, item);  // Update
+        this.dataService.updateItem(this.currentId, item).subscribe(
+          () => this.router.navigate(['/list']),
+          error => this.errorMessage = error
+        );
       } else {
-        this.dataService.addItem(item);  // Add
+        this.dataService.addItem(item).subscribe(
+          () => this.router.navigate(['/list']),
+          error => this.errorMessage = error
+        );
       }
-      this.itemForm.reset();  // Reset form
-      this.router.navigate(['/list']);  // Redirect to list
+      this.itemForm.reset();
     }
   }
 
   onReset(): void {
-    this.itemForm.reset();  // Reset form
+    this.itemForm.reset();
   }
 }
