@@ -11,27 +11,33 @@ import { IContent } from '../mock-data';
 })
 export class ListComponent implements OnInit {
   items: IContent[] = [];
+  errorMessage: string = '';
 
   constructor(private dataService: DataService, private router: Router) { }
 
   ngOnInit(): void {
-    this.loadItems();  // Load items on init
+    this.loadItems();
   }
 
   loadItems(): void {
-    this.items = this.dataService.getItems();  // Get all items
+    this.dataService.getItems().subscribe(
+      items => this.items = items,
+      error => this.errorMessage = error
+    );
   }
 
   onEdit(id: number): void {
-    this.router.navigate(['/form', id]);  // Navigate to form for editing
+    this.router.navigate(['/form', id]);
   }
 
   onDelete(id: number): void {
-    this.dataService.deleteItem(id);  // Delete item
-    this.loadItems();  // Refresh list
+    this.dataService.deleteItem(id).subscribe(
+      () => this.loadItems(),
+      error => this.errorMessage = error
+    );
   }
 
   onAdd(): void {
-    this.router.navigate(['/form']);  // Navigate to form for adding
+    this.router.navigate(['/form']);
   }
 }
