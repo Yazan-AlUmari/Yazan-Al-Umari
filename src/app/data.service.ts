@@ -1,39 +1,75 @@
 // data.service.ts
 import { Injectable } from '@angular/core';
-import { mockData, IContent } from './mock-data';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { IContent } from './mock-data';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
-  private items: IContent[] = [...mockData];  // Copy of mock data for manipulation
+  private itemsUrl = 'api/items';
 
-  constructor() { }
+  httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
+
+  constructor(private http: HttpClient) { }
 
   // Read: Get all items
-  getItems(): IContent[] {
-    return this.items;
+  getItems(): Observable<IContent[]> {
+    return this.http.get<IContent[]>(this.itemsUrl)
+      .pipe(
+        tap(_ => this.log('fetched items')),
+        catchError(this.handleError<IContent[]>('getItems', []))
+      );
   }
 
   // Read: Get a single item by ID
-  getItemById(id: number): IContent | undefined {
-    return this.items.find(item => item.id === id);
+  getItemById(id: number): Observable<IContent> {
+    const url = `${this.itemsUrl}/${id}`;
+    return this.http.get<IContent>(url).pipe(
+      tap(_ => this.log(`fetched item id=${id}`)),
+      catchError(this.handleError<IContent>(`getItem id=${id}`))
+    );
   }
 
-  addItem(item: IContent): void {
-    this.items.push(item);
+  // Add: Add a new item
+  addItem(item: IContent): Observable<IContent> {
+    return this.http.post<IContent>(this.itemsUrl, item, this.httpOptions).pipe(
+      tap((newItem: IContent) => this.log(`added item w/ id=${newItem.id}`)),
+      catchError(this.handleError<IContent>('addItem'))
+    );
   }
 
-  // Update: Update an existing item by ID
-  updateItem(id: number, updatedItem: IContent): void {
-    const index = this.items.findIndex(item => item.id === id);
-    if (index !== -1) {
-      this.items[index] = updatedItem;
-    }
+  // Update: Update an existing item
+  updateItem(id: number, item: IContent): Observable<any> {
+    const url = `${this.itemsUrl}/${id}`;
+    return this.http.put(url, item, this.httpOptions).pipe(
+      tap(_ => this.log(`updated item id=${id}`)),
+      catchError(this.handleError<any>('updateItem'))
+    );
   }
 
-  // Delete: Remove an item by ID
-  deleteItem(id: number): void {
-    this.items = this.items.filter(item => item.id !== id);
+  // Delete: Delete an item by ID
+  deleteItem(id: number): Observable<IContent> {
+    const url = `${this.itemsUrl}/${id}`;
+    return this.http.delete<IContent>(url, this.httpOptions).pipe(
+      tap(_ => this.log(`deleted item id=${id}`)),
+      catchError(this.handleError<IContent>('deleteItem'))
+    );
+  }
+
+  private log(message: string) {
+    console.log(`DataService: ${message}`);
+  }
+
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(error); // log to console instead
+      this.log(`${operation} failed: ${error.message}`);
+      return of(result as T);
+    };
   }
 }
